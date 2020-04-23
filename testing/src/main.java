@@ -1,9 +1,4 @@
-import javax.xml.transform.Result;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Hashtable;
 import java.util.Scanner;
 
 public class main {
@@ -23,15 +18,12 @@ public class main {
     //  TODO to make it look nicer all the switch case methods can be implementing in a method so it wont look crowded  !!!!!!!!!
 
     public static void main(String args[]) throws  SQLException{
-        String insertionQuery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, tc_no) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
-        String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, isAdmin) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
-        String deletingEmployeeQuery = "DELETE FROM employee WHERE username = ? AND password = ?";
-        String employeeLoginQuery = "SELECT username,password, name  FROM employee";
-        String managerLoginQuery = "SELECT username, password,name FROM manager";
-        String adminLoginQuery = "SELECT username, password,name FROM administrator";
+        String employeeLoginQuery = "SELECT *  FROM employee";
+        String managerLoginQuery = "SELECT * FROM manager";
+        String adminLoginQuery = "SELECT * FROM administrator";
+        Administrator administrator = null;
+        Employee employee = null;
 
-        Calendar calendar = Calendar.getInstance();
-        java.sql.Date startDate = new java.sql.Date(calendar.getTime().getTime());
 
         Scanner scanner = new Scanner(System.in);
         DatabaseConnection databaseConnection = new DatabaseConnection();
@@ -67,20 +59,9 @@ public class main {
                 String newPassword = scanner.next();
                 System.out.println("TC Number: ");
                 int newTC_NO = scanner.nextInt();
+                 employee = new Employee(newName, newSurname, newUsername, newPassword, newAge, newEmail, newTC_NO);
 
-                // inserting into database
-                PreparedStatement preparedStatement = connection.prepareStatement(insertionQuery);
-                preparedStatement.setString(1, newName);
-                preparedStatement.setString(2, newSurname);
-                preparedStatement.setString(3, newUsername);
-                preparedStatement.setString(4, newPassword);
-                preparedStatement.setInt(5, newAge);
-                preparedStatement.setString(6, newEmail);
-                preparedStatement.setDate(7, startDate);
-                preparedStatement.setInt(8, newTC_NO);
-                preparedStatement.execute();
                 break;
-
             case 2:
                 boolean entered = false;
                 System.out.println("Employee Username: ");
@@ -89,7 +70,7 @@ public class main {
                 String employeePassword = scanner.next();
 
 
-                ResultSet employeeRS = st.executeQuery(employeeLoginQuery);
+                  ResultSet employeeRS = st.executeQuery(employeeLoginQuery);
 
                 while(employeeRS.next()){
                     _username = employeeRS.getString("username");
@@ -136,8 +117,10 @@ public class main {
                     _username = adminRS.getString("username");
                     _password = adminRS.getString("password");
                     _name = adminRS.getString("name");
+                    _tc_no = adminRS.getInt(("tc_no"));
                     if(adminName.equals(_username) & adminPassword.equals(_password)){
                         System.out.println("Welcome Admin: " + _name );
+                        administrator = new Administrator(_username, _password, _name, _tc_no);
                         _isAdmin = 1;
                     }
                 }
@@ -159,61 +142,29 @@ public class main {
                     System.out.println("Name: ");
                     String newName = scanner.next();
                     System.out.println("Surname: ");
-                    String _surnamee = scanner.next();
+                    String newSurname = scanner.next();
                     System.out.println("Age: ");
                     int newAge = scanner.nextInt();
                     System.out.println("Email: ");
                     String newEmail = scanner.next();
+                    System.out.println("TC NO: ");
+                    int newTC_NO = scanner.nextInt();
                     System.out.println("Username: ");
                     String  newUsername = scanner.next();
                     System.out.println("Password: ");
                     String newPassword = scanner.next();
-                    System.out.println("Is she/he an admin? Enter 1 for yes 0 for no: ");
-                    int newIsAdmin = scanner.nextInt();
 
-                    /* Creating new employee */
-                    PreparedStatement preparedStatement = connection.prepareStatement(creatingEmployeeQuery);
-                    preparedStatement.setString(1, newName);
-                    preparedStatement.setString(2, _surnamee);
-                    preparedStatement.setString(3, newUsername);
-                    preparedStatement.setString(4, newPassword);
-                    preparedStatement.setInt(5, newAge);
-                    preparedStatement.setString(6, newEmail);
-                    preparedStatement.setDate(7, startDate);
-                    preparedStatement.setInt(8, newIsAdmin);
-                    preparedStatement.execute();
+                    administrator.createEmployee(newName, newSurname, newAge, newEmail, newUsername, newPassword, newTC_NO);
                     break;
 
                 case 2:
                     // TODO instead of entering username and password create an are in sql called TC kimlik
+                    System.out.println("Enter the TC NO of the employee you want to delete.");
+                    System.out.println("TC NO: ");
+                    int tc_no = scanner.nextInt();
+                    administrator.deleteEmployee(tc_no);
+                    // TODO loop until user chooses register (if it is the third time user enters wrong information exit from the system.)
 
-                    System.out.println("Enter the username and password of the employee you want to delete.");
-                    boolean deleted = false;
-                    System.out.println("Username: ");
-                    String _usernamee = scanner.next();
-                    System.out.println("Password: ");
-                    String _passwordd = scanner.next();
-                    ResultSet rs_delete = st.executeQuery(employeeLoginQuery);
-                    while(rs_delete.next()){
-                        _username = rs_delete.getString("username");
-                        _password = rs_delete.getString("password");
-
-                        if(_usernamee.equals(_username) & _passwordd.equals(_password)){
-                            PreparedStatement preparedStatement1 = connection.prepareStatement(deletingEmployeeQuery);
-                            preparedStatement1.setString(1, _usernamee);
-                            preparedStatement1.setString(2, _passwordd);
-                            System.out.println("User Deleted");
-                            preparedStatement1.execute();
-                            deleted = true;
-                            break;
-                        }
-                    }
-
-                    if(!deleted){
-                        System.out.println("There is no employee with that username / password");
-                        System.exit(0);
-                        // TODO loop until user chooses register (if it is the third time user enters wrong information exit from the system.)
-                    }
                     break;
                 case 3:
                     // TODO instead of entering username and password create an are in sql called TC kimlik

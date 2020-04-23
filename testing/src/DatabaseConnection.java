@@ -3,11 +3,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    private String url = "jdbc:mysql://localhost/se318?useLegacyDatetimeCode=false&serverTimezone=UTC";
+    private String url = "jdbc:mysql://79.98.129.3/bagdiken_se318?useLegacyDatetimeCode=false&serverTimezone=UTC";
 
     public Connection getConnection() throws SQLException {
 
-        return DriverManager.getConnection(url,"root","");
+        return DriverManager.getConnection(url,"bagdiken_se318","XEZ#)^My3BHm");
     }
 
 
