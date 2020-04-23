@@ -25,9 +25,10 @@ public class main {
         String insertionQuery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, tc_no) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
         String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, isAdmin) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
         String deletingEmployeeQuery = "DELETE FROM employee WHERE username = ? AND password = ?";
-        String employeeLoginQuery = "SELECT username,password, name isAdmin FROM employee";
+        String employeeLoginQuery = "SELECT username,password, name  FROM employee";
         String managerLoginQuery = "SELECT username, password,name FROM manager";
         String adminLoginQuery = "SELECT username, password,name FROM administrator";
+
         Calendar calendar = Calendar.getInstance();
         java.sql.Date startDate = new java.sql.Date(calendar.getTime().getTime());
 
@@ -52,39 +53,38 @@ public class main {
                 // TODO pick good variable names
                 System.out.println("Please enter the fallowing information respectively");
                 System.out.println("Name: ");
-                String _namee = scanner.next();
+                String newName = scanner.next();
                 System.out.println("Surname: ");
-                String _surnamee = scanner.next();
+                String newSurname = scanner.next();
                 System.out.println("Age: ");
-                int _agee = scanner.nextInt();
+                int newAge = scanner.nextInt();
                 System.out.println("Email: ");
-                String _emaill = scanner.next();
+                String newEmail = scanner.next();
                 System.out.println("Username: ");
-                String  _usernameee = scanner.next();
+                String  newUsername = scanner.next();
                 System.out.println("Password: ");
-                String _passworddd = scanner.next();
+                String newPassword = scanner.next();
                 System.out.println("TC Number: ");
-                int _tc_no = scanner.nextInt();
-
-
+                int newTC_NO = scanner.nextInt();
 
                 // inserting into database
                 PreparedStatement preparedStatement = connection.prepareStatement(insertionQuery);
-                preparedStatement.setString(1, _namee);
-                preparedStatement.setString(2, _surnamee);
-                preparedStatement.setString(3, _usernameee);
-                preparedStatement.setString(4, _passworddd);
-                preparedStatement.setInt(5, _agee);
-                preparedStatement.setString(6, _emaill);
+                preparedStatement.setString(1, newName);
+                preparedStatement.setString(2, newSurname);
+                preparedStatement.setString(3, newUsername);
+                preparedStatement.setString(4, newPassword);
+                preparedStatement.setInt(5, newAge);
+                preparedStatement.setString(6, newEmail);
                 preparedStatement.setDate(7, startDate);
-                preparedStatement.setInt(8, _tc_no);
+                preparedStatement.setInt(8, newTC_NO);
                 preparedStatement.execute();
                 break;
+
             case 2:
                 boolean entered = false;
-                System.out.println("Username: ");
+                System.out.println("Employee Username: ");
                 String employeeName = scanner.next();
-                System.out.println("Password: ");
+                System.out.println("Employee Password: ");
                 String employeePassword = scanner.next();
 
 
@@ -95,8 +95,7 @@ public class main {
                     _password = employeeRS.getString("password");
                     _name = employeeRS.getString("name");
                     if(employeeName.equals(_username) & employeePassword.equals(_password)){
-                        System.out.println("Welcome Employee:" + _name );
-
+                        System.out.println("Welcome Employee: " + _name );
                         entered = true;
                         break;
                     }
@@ -131,7 +130,7 @@ public class main {
                 System.out.println("Password: ");
                 String adminPassword = scanner.next();
 
-                ResultSet adminRS = st.executeQuery(managerLoginQuery);
+                ResultSet adminRS = st.executeQuery(adminLoginQuery);
                 while(adminRS.next()){
                     _username = adminRS.getString("username");
                     _password = adminRS.getString("password");
@@ -319,16 +318,16 @@ public class main {
             preparedStatement.execute();
             System.out.println("Name updated! New email: " + email);
         }
-        if(update.equals("isAdmin")){
+        if(update.equals("tc_no")){
             System.out.println("Enter the new isAdmin 0 or 1");
-            String isAdmin = scanner.next();
-            String age = "UPDATE employee set isAdmin = ? WHERE username = ? AND password = ?";
+            int tc_no = scanner.nextInt();
+            String age = "UPDATE employee set tc_no = ? WHERE username = ? AND password = ?";
             preparedStatement = connection.prepareStatement(age);
-            preparedStatement.setString(1, isAdmin);
+            preparedStatement.setInt(1, tc_no);
             preparedStatement.setString(2, _username);
             preparedStatement.setString(3, _password);
             preparedStatement.execute();
-            System.out.println("Name updated! New isAdmin: " + isAdmin);
+            System.out.println("Name updated! New tc no: " + tc_no);
         }
     }
 
