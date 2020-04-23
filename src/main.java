@@ -14,13 +14,15 @@ public class main {
     private static String _email;
     private static String _lastLogin;
     private static int _isAdmin;
+    private static int _tc_no;
+
 
     //  TODO to make it look nicer all the switch case methods can be implementing in a method so it wont look crowded  !!!!!!!!!
 
     public static void main(String args[]) throws  SQLException{
-        String insertionquery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?)";
-        String insertionqueryCreatingEmployee = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, isAdmin) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
-        String insertionqueryDeletingEmployee = "DELETE FROM employee WHERE username = ? AND password = ?";
+        String insertionquery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, tc_no) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
+        String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, lastlogin, isAdmin) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?, ?)";
+        String deletingEmployeeQuery = "DELETE FROM employee WHERE username = ? AND password = ?";
         String query = "SELECT username,password, isAdmin FROM employee";
 
         Calendar calendar = Calendar.getInstance();
@@ -54,6 +56,10 @@ public class main {
                 String  _usernameee = scanner.next();
                 System.out.println("Password: ");
                 String _passworddd = scanner.next();
+                System.out.println("TC Number: ");
+                int _tc_no = scanner.nextInt();
+
+
 
                 // inserting into database
                 PreparedStatement preparedStatement = connection.prepareStatement(insertionquery);
@@ -64,8 +70,8 @@ public class main {
                 preparedStatement.setInt(5, _agee);
                 preparedStatement.setString(6, _emaill);
                 preparedStatement.setDate(7, startDate);
+                 preparedStatement.setInt(8, _tc_no);
                 preparedStatement.execute();
-
                 break;
             case 2:
                 boolean entered = false;
@@ -82,7 +88,7 @@ public class main {
                      _password = rs.getString("password");
                     _isAdmin = rs.getInt("isAdmin");
                     if(_usernamee.equals(_username) & _passwordd.equals(_password)){
-                        System.out.println("You are in");
+                        System.out.println("Welcome ");
                         entered = true;
                         break;
                     }
@@ -98,7 +104,8 @@ public class main {
                 System.exit(0);
         }
 
-        System.out.println("Press 1 to create new employees.. 2 to delete.. 3 to update (you can only create new employees if you are admin)");
+        // TODO CASE 4
+        System.out.println("Press 1 to create new employees.. 2 to delete.. 3 to update ... 4 to check worksheet from employees");
         int selection = scanner.nextInt();
         if(_isAdmin == 1) {
         switch (selection){
@@ -121,7 +128,7 @@ public class main {
                     int _isAdminn = scanner.nextInt();
 
                     /* Creating new employee */
-                    PreparedStatement preparedStatement = connection.prepareStatement(insertionqueryCreatingEmployee);
+                    PreparedStatement preparedStatement = connection.prepareStatement(creatingEmployeeQuery);
                     preparedStatement.setString(1, _namee);
                     preparedStatement.setString(2, _surnamee);
                     preparedStatement.setString(3, _usernameee);
@@ -148,7 +155,7 @@ public class main {
                     _password = rs_delete.getString("password");
 
                     if(_usernamee.equals(_username) & _passwordd.equals(_password)){
-                        PreparedStatement preparedStatement1 = connection.prepareStatement(insertionqueryDeletingEmployee);
+                        PreparedStatement preparedStatement1 = connection.prepareStatement(deletingEmployeeQuery);
                         preparedStatement1.setString(1, _usernamee);
                         preparedStatement1.setString(2, _passwordd);
                         System.out.println("User Deleted");
@@ -167,7 +174,6 @@ public class main {
             case 3:
                 // TODO instead of entering username and password create an are in sql called TC kimlik
                 // TODO update part must be in a loop that where user updates as needed
-                // TODO When choosing update if user is not admin he can only update their own information and he con not edit isAdmin option
                 System.out.println("Enter the username and password of the employee you want to update.");
                 boolean updated = false;
                 System.out.println("Username: ");
@@ -286,6 +292,7 @@ public class main {
             System.out.println("Name updated! New isAdmin: " + isAdmin);
         }
     }
+
 }
 
 
