@@ -19,6 +19,7 @@ public class main {
 
 
 
+
     //  TODO to make it look nicer all the switch case methods can be implementing in a method so it wont look crowded  !!!!!!!!!
 
     public static void main(String args[]) throws  SQLException{
