@@ -44,8 +44,11 @@ public class adminOperations {
         System.out.println("Enter the TC NO of the user that you want to delete.");
         System.out.print("TC Number: ");
         String tc_no = scanner.nextLine();
-        users.delete(tc_no);
+        users _users = new users();
+        _users.deleteByTC(tc_no);
+
     }
+
 
     public void update(){
         // TODO instead of entering username and password create an are in sql called TC kimlik

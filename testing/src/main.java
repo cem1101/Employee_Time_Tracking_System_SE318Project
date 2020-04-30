@@ -7,6 +7,10 @@ public class main {
 
     public static void main(String args[]) throws SQLException {
 
+        //users.deleteByTC("444");
+        //users.updateProcedure();
+
+
         System.out.println("Welcome!");
         System.out.println("Enter 1 for registration");
         System.out.println("Enter 2 for login ");

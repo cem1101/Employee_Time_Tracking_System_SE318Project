@@ -8,8 +8,8 @@ public class Administrator {
     private int _tc_no;
 
     private Scanner scanner = new Scanner(System.in);
-    private DatabaseConnection databaseConnection = new DatabaseConnection();
-    private Connection connection = databaseConnection.getConnection();
+    private db databaseConnection = new db();
+    private Connection connection = databaseConnection.connect();
     private Statement st = connection.createStatement();
 
     private String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, tc_no) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?)";
