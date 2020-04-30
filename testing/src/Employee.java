@@ -16,7 +16,7 @@ public class Employee {
     private Scanner scanner = new Scanner(System.in);
     private DatabaseConnection databaseConnection = new DatabaseConnection();
     private Connection connection = databaseConnection.getConnection();
-    private String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, tc_no) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?)";
+    private String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, tc) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?)";
 
 
     public Employee(String newName, String newSurname, String newUsername, String newPassword, int newAge, String newEmail, int newTC_NO  ) throws SQLException {
