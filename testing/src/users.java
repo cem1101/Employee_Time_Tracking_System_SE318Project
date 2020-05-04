@@ -1,12 +1,10 @@
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class users{
+class Users {
 
-
-    static class user{
+    static class User {
         public static String[] fields = {"authgroup","name","surname","password","username","age","email","tcNo"};
 
         public static int id;
@@ -26,31 +24,29 @@ public class users{
             return load("tc",_data);
         }
 
-
         public static boolean load(String colm, String _data){
-            try{
+            String qq = "SELECT * FROM users where "+ colm + "=" + _data;
+            try {
+                Connection connection = db.connect();
+                Statement st = connection.createStatement();
+                ResultSet load = st.executeQuery(qq);
 
-                PreparedStatement preparedStatement = db.connect().prepareStatement("SELECT * FROM users where ?=?");
-                preparedStatement.setString(1, colm);
-                preparedStatement.setString(2, _data);
-                ResultSet result = preparedStatement.executeQuery();
-                if(result.next() == false){
-                    return false;
+                while(load.next()){
+                    id = load.getInt("id");
+                    authgroup = load.getInt("authgroup");
+                    name = load.getString("name");
+                    surname = load.getString("surname");
+                    username = load.getString("username");
+                    password = load.getString("password");
+                    age = load.getInt("age");
+                    email = load.getString("email");
+                    tcNo = load.getString("tc");
+                    return true;
                 }
-                id = result.getInt("id");
-                authgroup = result.getInt("authgroup");
-                age = result.getInt("age");
-                tcNo = result.getString("tc");
-                name = result.getString("name");
-                surname = result.getString("surname");
-                username = result.getString("username");
-                password = result.getString("password");
-                email = result.getString("email");
-                return true;
-            }catch(SQLException e){
-                System.out.println(e.getMessage());
-                return false;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+            return false;
         }
 
         public static void create(){
@@ -60,18 +56,18 @@ public class users{
             crud("update");
         }
 
-        public static void delete(){
+        public static void delete()  {
+            crud("delete");
 
         }
 
         public static void crud(String type){
             String query;
             if(type == "delete"){
-                query = "delete users where id=?";
+                query = "delete FROM users where tc=?";
                 try {
                     PreparedStatement preparedStatement = db.connect().prepareStatement(query);
-                    preparedStatement.setInt(1, id);
-
+                    preparedStatement.setString(1, tcNo);
                     preparedStatement.execute();
                 } catch (SQLException throwables) {
                     System.out.println(throwables.getMessage());
@@ -106,12 +102,43 @@ public class users{
                     throwables.printStackTrace();
                 }
             }
-
-
-
-
         }
 
+        // gets the user info so when employee submitting a worksheet only need to fill part is Content other information filled automatically
+        public void submitEmployeeWorksheet(User user) throws SQLException {
+            Scanner scanner = new Scanner(System.in);
+            Connection connection = db.connect();
+            String query = "INSERT INTO worksheets ( responsible, responsibleID,content, status)"  + "VALUES (?, ? , ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, user.name);
+            System.out.println("name " + user.name);
+            preparedStatement.setInt(2, user.id);
+            System.out.println("What is the content of worksheet? ");
+            String content = scanner.next();
+            preparedStatement.setString(3, content);
+            preparedStatement.setInt(4, 0);
+            preparedStatement.execute();
+            System.out.println("Worksheet submitted");
+        }
+
+        public void loadEmployeeWorksheet(User user) throws SQLException  {
+            String query = "Select * FROM worksheets Where responsibleID = "+  user.id;
+
+            Connection connection = db.connect();
+            Statement st = connection.createStatement();
+            ResultSet loadWorksheets = st.executeQuery(query);
+            while(loadWorksheets.next()){
+                int id = loadWorksheets.getInt("ID");
+                String responsible = loadWorksheets.getString("responsible");
+                int responsibleID = loadWorksheets.getInt("responsibleID");
+                String admin = loadWorksheets.getString("admin");
+                String manager = loadWorksheets.getString("manager");
+                String content = loadWorksheets.getString("content");
+                int status = loadWorksheets.getInt("status");
+                System.out.printf("ID: %d%nResponsible: %s%nResponsibleID: %d%nAdmin: %s%nManager: %s%nContent: %s%nStatus: %d%n",id,responsible,responsibleID,admin,manager,content,status);
+                System.out.printf("--------------------------------------------------------------------------------------------------------------------------------------------------------%n");
+            }
+        }
 
 
     }
@@ -130,24 +157,17 @@ public class users{
 
     public static db db = new db();
 
-    public static void main(String args[]){
-
-    }
-
-
-
-
-    public static void register(String newName, String newSurname, String newUsername, String newPassword, int newAge, String newEmail, int newTC_NO  ) throws SQLException {
-
+    public static void register(int newAuthgroup, String newName, String newSurname, String newUsername, String newPassword, int newAge, String newEmail, int newTC_NO  ) throws SQLException {
         Connection connection = db.connect();
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users ( name, surname, username, password, age, email, tc) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?)");
-        preparedStatement.setString(1, newName);
-        preparedStatement.setString(2, newSurname);
-        preparedStatement.setString(3, newUsername);
-        preparedStatement.setString(4, newPassword);
-        preparedStatement.setInt(5, newAge);
-        preparedStatement.setString(6, newEmail);
-        preparedStatement.setInt(7, newTC_NO);
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users ( authgroup, name, surname, username, password, age, email, tc) " + "VALUES ( ?,? , ?, ? , ?, ?, ?, ?)");
+        preparedStatement.setInt(1, newAuthgroup);
+        preparedStatement.setString(2, newName);
+        preparedStatement.setString(3, newSurname);
+        preparedStatement.setString(4, newUsername);
+        preparedStatement.setString(5, newPassword);
+        preparedStatement.setInt(6, newAge);
+        preparedStatement.setString(7, newEmail);
+        preparedStatement.setInt(8, newTC_NO);
         preparedStatement.execute();
     }
 
@@ -156,9 +176,10 @@ public class users{
     public static void registerProcedure()  throws  SQLException{
         // TODO Give error if someone enter wrong information
         // TODO pick good variable names
-        Employee employee = null;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the fallowing information respectively");
+        System.out.print("Authgroup: ");
+        int newAuthgroup = scanner.nextInt();
         System.out.print("Name: ");
         String newName = scanner.next();
         System.out.print("Surname: ");
@@ -173,7 +194,7 @@ public class users{
         String newPassword = scanner.next();
         System.out.print("TC Number: ");
         int newTC_NO = scanner.nextInt();
-        users.register(newName, newSurname, newUsername, newPassword, newAge, newEmail, newTC_NO);
+        Users.register(newAuthgroup, newName, newSurname, newUsername, newPassword, newAge, newEmail, newTC_NO);
         System.out.println("Registration success. Please login.");
     }
 
@@ -227,16 +248,10 @@ public class users{
         }
     }
 
-
-
-
-
-
-
     public static boolean updateProcedure()  throws  SQLException{
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Select user by TC Number: ");
-        String searchTC = scanner.nextLine();
+        System.out.print("Enter the TC  of the employee you want to update. ");
+        String searchTC = scanner.next();
         
 
         PreparedStatement preparedStatement = db.connect().prepareStatement("SELECT * FROM users where tc=?");
@@ -249,11 +264,11 @@ public class users{
         }
 
         System.out.println("You are updating "+result.getString("name"));
-        int userID = Integer.parseInt(result.getString("id"));
-            user _user = new user();
-            _user.load(userID);
+        String tcNo = result.getString("tc");
+            User _user = new User();
+            _user.loadByTC(tcNo);
             System.out.println("Enter new values, if do not want to change related field, pass the field blank.");
-            for (String row : user.fields)
+            for (String row : User.fields)
             {
                 System.out.print(row+"\t:");
                 String tmp = scanner.nextLine();
@@ -274,32 +289,48 @@ public class users{
             _user.update();
             System.out.print("revisions have been saved.");
             System.out.println(result);
-
-
-
-
-            System.exit(0);
             return true;
 
     }
 
-    public static boolean deleteByTC(String tc){
-        user _user = new user();
-        if(_user.loadByTC(tc) == false){
-            return false;
-        };
-        _user.delete();
-         return true;
+
+
+   public static void deleteByTC(String tc) throws SQLException {
+        User _user = new User();
+        _user.loadByTC(tc);
+         _user.delete();
     }
-    public static boolean deleteByID(int id){
+
+    public static void submitEmployeeWS(String tcNo) throws SQLException {
+        User _user = new User();
+        _user.loadByTC(tcNo);
+        _user.submitEmployeeWorksheet(_user);
+    }
+
+    public static void checkEmployeeWS(String tcNo) throws SQLException{
+        User _user = new User();
+        _user.loadByTC(tcNo);
+
+        _user.loadEmployeeWorksheet(_user);
+
+    }
+
+    public void editWorksheet(String tcNo) throws SQLException {
+        //TODO Edit worksheet by everyone
+
+    }
+ /*  public static boolean deleteByID(int id){
         user _user = new user();
         _user.load(id);
+        System.out.println(_user.name);
         _user.delete();
         return true;
-    }
+    } */
 
 
-
+// private String creatingEmployeeQuery = "INSERT INTO employee ( name, surname, username, password, age, email, tc_no) " + "VALUES ( ? , ?, ? , ?, ?, ?, ?)";
+//    private String deletingEmployeeQuery = "DELETE FROM employee WHERE tc_no= ?";
+//    private String employeeQuery = "SELECT *  FROM employee";
 
 }
 
