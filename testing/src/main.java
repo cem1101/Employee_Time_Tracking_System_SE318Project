@@ -7,19 +7,21 @@ public class main {
 
     public static void main(String args[]) throws SQLException {
 
-        System.out.println("Welcome!");
-        System.out.println("Enter 1 for registration");
-        System.out.println("Enter 2 for login ");
-        System.out.println("Enter 3 for quit");
 
-        int answer = scanner.nextInt();
+
 
         boolean mainLoop = true;
         while (mainLoop) {
+            System.out.println("Welcome!");
+            System.out.println("Enter 1 for registration");
+            System.out.println("Enter 2 for login ");
+            System.out.println("Enter 3 for quit");
+            int answer = scanner.nextInt();
+
             switch (answer) {
                 case 1:
                     Users.registerProcedure();
-                    mainLoop = false;
+
                     break;
                 case 2:
                     if (Users.loginProcedure()) {
@@ -45,13 +47,14 @@ public class main {
                 // call employee operations menu
                 String tcNo = Users._tcNo;
                 EmployeeOperations employeeOperations = new EmployeeOperations();
-                employeeOperations.main(tcNo);
+                employeeOperations.main();
                 break;
 
             // manager
             case 2:
-                // call manager operations menu
-
+                tcNo = Users._tcNo;
+                ManagerOperations managerOperations = new ManagerOperations();
+                managerOperations.main();
                 break;
             // admin
             case 3:

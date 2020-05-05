@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 class Users {
 
+
     static class User {
         public static String[] fields = {"authgroup","name","surname","password","username","age","email","tcNo"};
 
@@ -105,14 +106,14 @@ class Users {
         }
 
         // gets the user info so when employee submitting a worksheet only need to fill part is Content other information filled automatically
-        public void submitEmployeeWorksheet(User user) throws SQLException {
+        public void submitEmployeeWorksheet() throws SQLException {
+            System.out.println("Employee name: "+   _name);
             Scanner scanner = new Scanner(System.in);
             Connection connection = db.connect();
             String query = "INSERT INTO worksheets ( responsible, responsibleID,content, status)"  + "VALUES (?, ? , ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, user.name);
-            System.out.println("name " + user.name);
-            preparedStatement.setInt(2, user.id);
+            preparedStatement.setString(1, _name);
+            preparedStatement.setInt(2, _id);
             System.out.println("What is the content of worksheet? ");
             String content = scanner.next();
             preparedStatement.setString(3, content);
@@ -121,8 +122,8 @@ class Users {
             System.out.println("Worksheet submitted");
         }
 
-        public void loadEmployeeWorksheet(User user) throws SQLException  {
-            String query = "Select * FROM worksheets Where responsibleID = "+  user.id;
+        public void loadEmployeeWorksheet( ) throws SQLException  {
+            String query = "Select * FROM worksheets Where responsibleID = "+  _id;
 
             Connection connection = db.connect();
             Statement st = connection.createStatement();
@@ -141,6 +142,48 @@ class Users {
         }
 
 
+        public void approveWorksheets() throws SQLException {
+            Scanner scanner = new Scanner(System.in);
+            String query = "Select * FROM worksheets Where status = 0 or status = 2";
+            //TODO Make a method just for loading worksheet info so that loadEmployeeWorksheet and approveWorksheets
+            // TODO can use it.
+            Connection connection = db.connect();
+            Statement st = connection.createStatement();
+            ResultSet loadWorksheets = st.executeQuery(query);
+            System.out.println("These are the available worksheets right now:");
+            while(loadWorksheets.next()){
+                int id = loadWorksheets.getInt("ID");
+                String responsible = loadWorksheets.getString("responsible");
+                int responsibleID = loadWorksheets.getInt("responsibleID");
+                String admin = loadWorksheets.getString("admin");
+                String manager = loadWorksheets.getString("manager");
+                String content = loadWorksheets.getString("content");
+                int status = loadWorksheets.getInt("status");
+                System.out.printf("ID: %d%nResponsible: %s%nResponsibleID: %d%nAdmin: %s%nManager: %s%nContent: %s%nStatus: %d%n",id,responsible,responsibleID,admin,manager,content,status);
+                System.out.printf("--------------------------------------------------------------------------------------------------------------------------------------------------------%n");
+        }
+            int wsID;
+            while(true) {
+                System.out.printf("Write the worksheet ID you want to approved or revised");
+                wsID = scanner.nextInt();
+                String query2 = "Select * FROM worksheets Where ID = " + wsID;
+                ResultSet approveWorksheets = st.executeQuery(query2);
+                if (approveWorksheets.next() == false) {
+                    System.out.println("there is no user!");
+                }else
+                    break;
+            }
+
+            System.out.printf("If you want to approve it press 1.. if you want it to be revised press 2");
+            int choice = scanner.nextInt();
+            // TODO make an update worksheet method so that admin and manager can use both
+            String query3 = "update worksheets set manager = ?, status = ? where ID = " + wsID;
+            PreparedStatement preparedStatement = connection.prepareStatement(query3);
+            preparedStatement.setString(1, this.name);
+            preparedStatement.setInt(2, choice);
+            preparedStatement.execute();
+            System.out.println("Your choice have been done! ");
+        }
     }
 
 
@@ -301,24 +344,27 @@ class Users {
          _user.delete();
     }
 
-    public static void submitEmployeeWS(String tcNo) throws SQLException {
+    public static void submitEmployeeWS() throws SQLException {
         User _user = new User();
-        _user.loadByTC(tcNo);
-        _user.submitEmployeeWorksheet(_user);
+        _user.submitEmployeeWorksheet();
     }
 
-    public static void checkEmployeeWS(String tcNo) throws SQLException{
+    public static void checkEmployeeWS( ) throws SQLException{
         User _user = new User();
-        _user.loadByTC(tcNo);
-
-        _user.loadEmployeeWorksheet(_user);
+        _user.loadEmployeeWorksheet();
 
     }
 
-    public void editWorksheet(String tcNo) throws SQLException {
+    public void editWorksheet() throws SQLException {
         //TODO Edit worksheet by everyone
 
     }
+
+    public void approveWS() throws SQLException {
+        User _user = new User();
+        _user.approveWorksheets();
+    }
+
  /*  public static boolean deleteByID(int id){
         user _user = new user();
         _user.load(id);

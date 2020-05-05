@@ -20,6 +20,9 @@ public class adminOperations {
                     case 3:
                         update();
                         break;
+                    case 4:
+                        checkWorksheets();
+                        break;
                     case 5:
                         isContinue = false;
                         System.exit(1);
@@ -27,6 +30,12 @@ public class adminOperations {
                 }
             }
         }
+
+    private void checkWorksheets() throws SQLException {
+        Users _users = new Users();
+
+    }
+
     public void create() throws SQLException {
         System.out.println("Please enter the employee information");
         System.out.println("Name: ");
