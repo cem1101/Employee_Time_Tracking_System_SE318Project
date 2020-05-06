@@ -7,9 +7,6 @@ public class main {
 
     public static void main(String args[]) throws SQLException {
 
-
-
-
         boolean mainLoop = true;
         while (mainLoop) {
             System.out.println("Welcome!");
