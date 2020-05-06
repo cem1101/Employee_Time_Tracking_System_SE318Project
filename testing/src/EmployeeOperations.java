@@ -7,6 +7,7 @@ public class EmployeeOperations {
         // TODO format
         boolean isContinue = true;
         while(isContinue) {
+            // Ask the employee to what he/she wants to do.
             System.out.println("Press 1 to see all worksheets you are responsible for.. 2 to send worksheet to admin.. 3 to edit worksheets 4 to exit");
             switch (scanner.nextInt()) {
                 case 1:
@@ -25,18 +26,21 @@ public class EmployeeOperations {
         }
     }
 
-    public void checkWorksheets() throws SQLException {
+    private void checkWorksheets() throws SQLException {
         Users _user = new Users();
+        // Call checkEmployeeWS
         _user.checkEmployeeWS();
     }
 
-    public void submitWorksheet() throws SQLException {
+    private void submitWorksheet() throws SQLException {
         Users _user = new Users();
+        // Call submitEmployeeWS
         _user.submitEmployeeWS();
     }
 
-    public void editWorksheet() throws SQLException {
+    private void editWorksheet() {
         Users _user = new Users();
+        // Call editWorksheet
         _user.editWorksheet();
     }
 }

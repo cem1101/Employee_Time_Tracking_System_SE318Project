@@ -6,7 +6,9 @@ public class adminOperations {
         public void main() throws SQLException{
             // TODO format
             boolean isContinue = true;
+
             while(isContinue) {
+                // Ask the admin to what he/she wants to do.
                 System.out.println("Press 1 to create new employees.. 2 to delete.. 3 to update ... 4 to check worksheet from employees 5 for exit");
                 switch (scanner.nextInt()) {
                     case 1:
@@ -32,11 +34,11 @@ public class adminOperations {
         }
 
     private void checkWorksheets() throws SQLException {
-        Users _users = new Users();
-
+            // TODO
     }
 
-    public void create() throws SQLException {
+    private void create() throws SQLException {
+            // Take all the information for new user
         System.out.println("Please enter the employee information");
         System.out.println("Name: ");
         String newName = scanner.next();
@@ -57,7 +59,8 @@ public class adminOperations {
         Users.register(authGroup, newName, newSurname, newUsername, newPassword,newAge,newEmail, newTC_NO);
     }
 
-    public void delete() throws SQLException {
+    private void delete() throws SQLException {
+            // Take TC number that user is going to be deleted
         System.out.println("Enter the TC NO of the user that you want to delete.");
         System.out.print("TC Number: ");
         String tc = scanner.next();
@@ -66,8 +69,9 @@ public class adminOperations {
 
     }
 
-    public void update() throws SQLException {
+    private void update() throws SQLException {
         Users _user = new Users();
+        // Call update procedure
         _user.updateProcedure();
     }
 

@@ -6,6 +6,7 @@ class Users {
 
 
     static class User {
+        // All the field in the users table in the DATABASE
         public static String[] fields = {"authgroup","name","surname","password","username","age","email","tcNo"};
 
         public static int id;
@@ -18,20 +19,27 @@ class Users {
         public static String email;
         public static String tcNo;
 
-        public static boolean load(int _data){
+      /*  public static boolean load(int _data){
             return load("id",""+_data);
-        }
-        public static boolean loadByTC(String _data){
+        }*/
+
+        private static boolean loadByTC(String _data) {
+            // Call the load method with the type "TC" and wanted "data"
             return load("tc",_data);
         }
 
-        public static boolean load(String colm, String _data){
+        private static boolean load(String colm, String _data){
+            // Query that takes the user from DB with the wanted Column name and data
             String qq = "SELECT * FROM users where "+ colm + "=" + _data;
             try {
+                // Connect database
                 Connection connection = db.connect();
+                // Create statement
                 Statement st = connection.createStatement();
+                // Execute query into resultset
                 ResultSet load = st.executeQuery(qq);
 
+                // If there is a user with wanted information call the user and load all the information.
                 while(load.next()){
                     id = load.getInt("id");
                     authgroup = load.getInt("authgroup");
@@ -44,37 +52,49 @@ class Users {
                     tcNo = load.getString("tc");
                     return true;
                 }
+                // Catch and print an error message if there is any exception
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             return false;
         }
 
-        public static void create(){
+        private static void create(){
+            // Call crud method with type "insert into"
             crud("insert into");
         }
-        public static void update(){
+        private static void update(){
+            // Call crud method with type "update"
             crud("update");
         }
 
-        public static void delete()  {
+        private static void delete()  {
+            // Call crud method with type "delete"
             crud("delete");
 
         }
 
-        public static void crud(String type){
+        private static void crud(String type){
             String query;
-            if(type == "delete"){
+            // Check if the type is delete or not
+            if(type.equals("delete")){
+                // Write to query that deletes user with selected "TC" number
                 query = "delete FROM users where tc=?";
                 try {
+                    // Create prepared statement with query that has missing values
                     PreparedStatement preparedStatement = db.connect().prepareStatement(query);
+                    // Set the missing value
                     preparedStatement.setString(1, tcNo);
+                    // Execute query
                     preparedStatement.execute();
+                    //  Catch for errors
                 } catch (SQLException throwables) {
                     System.out.println(throwables.getMessage());
                     throwables.printStackTrace();
                 }
+                // If type is not delete
             }else {
+                // Create to query for update or insert to new user
                 query = type+" users set " +
                         "authgroup=?," +
                         "age=?," +
@@ -86,7 +106,9 @@ class Users {
                         "email=?" +
                         " where id = ?";
                 try {
+                    // Create the prepared statement with the query
                     PreparedStatement preparedStatement = db.connect().prepareStatement(query);
+                    // Set all the missing values in the query
                     preparedStatement.setInt(1, authgroup);
                     preparedStatement.setInt(2, age);
                     preparedStatement.setString(3, tcNo);
@@ -96,8 +118,9 @@ class Users {
                     preparedStatement.setString(7, password);
                     preparedStatement.setString(8, email);
                     preparedStatement.setInt(9, id);
-
+                    // Execute the query
                     preparedStatement.execute();
+                    //  Catch for errors
                 } catch (SQLException throwables) {
                     System.out.println(throwables.getMessage());
                     throwables.printStackTrace();
@@ -106,28 +129,39 @@ class Users {
         }
 
         // gets the user info so when employee submitting a worksheet only need to fill part is Content other information filled automatically
-        public void submitEmployeeWorksheet() throws SQLException {
+        private void submitEmployeeWorksheet() throws SQLException {
             System.out.println("Employee name: "+   _name);
             Scanner scanner = new Scanner(System.in);
+            // Connect to the database
             Connection connection = db.connect();
+            // Write query to add new worksheet to the database
             String query = "INSERT INTO worksheets ( responsible, responsibleID,content, status)"  + "VALUES (?, ? , ?, ?)";
+            // Create prepared statement with the query
             PreparedStatement preparedStatement = connection.prepareStatement(query);
+            // Set missing values in the query (these are the name and _id of the user that submits the worksheets)
             preparedStatement.setString(1, _name);
             preparedStatement.setInt(2, _id);
+            // Take the content of the new worksheet
             System.out.println("What is the content of worksheet? ");
             String content = scanner.next();
+            // Set the content
             preparedStatement.setString(3, content);
             preparedStatement.setInt(4, 0);
+            // Execute query
             preparedStatement.execute();
             System.out.println("Worksheet submitted");
         }
 
-        public void loadEmployeeWorksheet( ) throws SQLException  {
+        private void loadEmployeeWorksheet( ) throws SQLException  {
+            // Query that calls worksheets only with the associated user ID
             String query = "Select * FROM worksheets Where responsibleID = "+  _id;
-
+            // Connect database
             Connection connection = db.connect();
+            // Create statement for the query
             Statement st = connection.createStatement();
+            // Execute query into result set
             ResultSet loadWorksheets = st.executeQuery(query);
+            // Until there is no more worksheet print all the information
             while(loadWorksheets.next()){
                 int id = loadWorksheets.getInt("ID");
                 String responsible = loadWorksheets.getString("responsible");
@@ -142,15 +176,20 @@ class Users {
         }
 
 
-        public void approveWorksheets() throws SQLException {
+        private void approveWorksheets() throws SQLException {
             Scanner scanner = new Scanner(System.in);
+            // Write query for the taking all the worksheets that are not approved or wanted to revised.
             String query = "Select * FROM worksheets Where status = 0 or status = 2";
             //TODO Make a method just for loading worksheet info so that loadEmployeeWorksheet and approveWorksheets
             // TODO can use it.
+            //Connect database
             Connection connection = db.connect();
+            // Create the statement without missing values
             Statement st = connection.createStatement();
+            // Execute the query
             ResultSet loadWorksheets = st.executeQuery(query);
             System.out.println("These are the available worksheets right now:");
+            // Take and print all the worksheet information until there is no more.
             while(loadWorksheets.next()){
                 int id = loadWorksheets.getInt("ID");
                 String responsible = loadWorksheets.getString("responsible");
@@ -163,24 +202,35 @@ class Users {
                 System.out.printf("--------------------------------------------------------------------------------------------------------------------------------------------------------%n");
         }
             int wsID;
+            // Until the wanted worksheet founded make a loop
             while(true) {
-                System.out.printf("Write the worksheet ID you want to approved or revised");
+                // Take the worksheet ID that admin or manager wants to change
+                System.out.println("Write the worksheet ID you want to approved or revised");
                 wsID = scanner.nextInt();
+                // Query that calls worksheet with selected ID value
                 String query2 = "Select * FROM worksheets Where ID = " + wsID;
+                // Execute query
                 ResultSet approveWorksheets = st.executeQuery(query2);
-                if (approveWorksheets.next() == false) {
+                // IF there is no worksheet with wanted ID give an error message
+                if (!approveWorksheets.next()) {
                     System.out.println("there is no user!");
                 }else
                     break;
             }
-
-            System.out.printf("If you want to approve it press 1.. if you want it to be revised press 2");
+            // Take the option if worksheet is approved or needs to be revised.
+            System.out.println("If you want to approve it press 1.. if you want it to be revised press 2");
             int choice = scanner.nextInt();
             // TODO make an update worksheet method so that admin and manager can use both
+            // Write the query that calls worksheet with wanted ID then
+            // Change the status with given value and after that change the manager name that
+            // who changed the worksheet information
             String query3 = "update worksheets set manager = ?, status = ? where ID = " + wsID;
+            // Create prepared statement because query have missing values
             PreparedStatement preparedStatement = connection.prepareStatement(query3);
+            // Enter the missing values
             preparedStatement.setString(1, this.name);
             preparedStatement.setInt(2, choice);
+            // Execute query
             preparedStatement.execute();
             System.out.println("Your choice have been done! ");
         }
@@ -188,7 +238,7 @@ class Users {
 
 
 
-
+    // User values in the DB
     public static int _id;
     public static int _authgroup;
     public static String _name;
@@ -201,8 +251,11 @@ class Users {
     public static db db = new db();
 
     public static void register(int newAuthgroup, String newName, String newSurname, String newUsername, String newPassword, int newAge, String newEmail, int newTC_NO  ) throws SQLException {
+        //Connect database
         Connection connection = db.connect();
+        // Create prepared statement for sql query
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users ( authgroup, name, surname, username, password, age, email, tc) " + "VALUES ( ?,? , ?, ? , ?, ?, ?, ?)");
+        // Set all the missing values in the query
         preparedStatement.setInt(1, newAuthgroup);
         preparedStatement.setString(2, newName);
         preparedStatement.setString(3, newSurname);
@@ -211,6 +264,7 @@ class Users {
         preparedStatement.setInt(6, newAge);
         preparedStatement.setString(7, newEmail);
         preparedStatement.setInt(8, newTC_NO);
+        // Execute the query
         preparedStatement.execute();
     }
 
@@ -219,6 +273,8 @@ class Users {
     public static void registerProcedure()  throws  SQLException{
         // TODO Give error if someone enter wrong information
         // TODO pick good variable names
+
+        //Take all the information from the user
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the fallowing information respectively");
         System.out.print("Authgroup: ");
@@ -237,19 +293,27 @@ class Users {
         String newPassword = scanner.next();
         System.out.print("TC Number: ");
         int newTC_NO = scanner.nextInt();
+
+        //Call user register method to save information to database
         Users.register(newAuthgroup, newName, newSurname, newUsername, newPassword, newAge, newEmail, newTC_NO);
         System.out.println("Registration success. Please login.");
     }
 
     public static boolean login(String username, String password) throws  SQLException{
-        
+        // Connect database
         Connection connection = db.connect();
+        // Create statement that have no missing value
         Statement st = connection.createStatement();
         String usernameTmp,passwordTmp;
+        // Execute to query to call all the user information in users table
         ResultSet managerRS = st.executeQuery("SELECT * FROM users");
+        // Take the information until it is end of the table
         while(managerRS.next()){
+            // Only take the username and password with the incoming information
             usernameTmp = managerRS.getString("username");
             passwordTmp = managerRS.getString("password");
+            // if the entered username and password equals to the database information
+            // save all the information to use after in the operations
             if(username.equals(usernameTmp) & password.equals(passwordTmp)){
                 _id = managerRS.getInt("id");
                 _authgroup = managerRS.getInt("authgroup");
@@ -259,15 +323,17 @@ class Users {
                 _age = managerRS.getInt("age");
                 _email = managerRS.getString("email");
                 _tcNo = managerRS.getString("tc");
-
                 return true;
             }
         }
         return false;
     }
 
+    // Check the user "authgroup" in the db and according that information
+    // assign the correct user type
     public static String getAuthGroup(){
         switch(_authgroup){
+            // three types of the user that can be
             case 1:return "employee";
             case 2:return "manager";
             case 3:return "admin";
@@ -278,13 +344,17 @@ class Users {
 
     public static boolean loginProcedure()  throws  SQLException{
         Scanner scanner = new Scanner(System.in);
+        // Take user name and password
         System.out.print("Username: ");
         String username = scanner.next();
         System.out.print("Password: ");
         String password = scanner.next();
+        // Check if the user is in the database
+        // if yes print welcome message
         if(login(username,password)){
             System.out.println("logged successfully "+_name+" "+_surname+". You are a "+getAuthGroup()+".");
             return true;
+        // if user is not in db print an error message
         }else{
             System.out.println("invalid username or password.");
             return false;
@@ -293,15 +363,19 @@ class Users {
 
     public static boolean updateProcedure()  throws  SQLException{
         Scanner scanner = new Scanner(System.in);
+        // Take the "TC" number of the user wanted to update
         System.out.print("Enter the TC  of the employee you want to update. ");
         String searchTC = scanner.next();
         
-
+        // Create prepared statement that calls users with the selected "TC" number
         PreparedStatement preparedStatement = db.connect().prepareStatement("SELECT * FROM users where tc=?");
+        // Set the missing values in the query
         preparedStatement.setString(1, searchTC);
+        // Execute the query
         ResultSet result = preparedStatement.executeQuery();
 
-        if(result.next() == false){
+        // If there is no user print error message
+        if(!result.next()){
             System.out.println("there is no user!");
             return false;
         }
@@ -309,10 +383,12 @@ class Users {
         System.out.println("You are updating "+result.getString("name"));
         String tcNo = result.getString("tc");
             User _user = new User();
+            // load user with the selected "TC" number
             _user.loadByTC(tcNo);
             System.out.println("Enter new values, if do not want to change related field, pass the field blank.");
             for (String row : User.fields)
             {
+                // Change all the values if there is an any update on them.
                 System.out.print(row+"\t:");
                 String tmp = scanner.nextLine();
                 if(tmp.length() > 0){
@@ -329,6 +405,7 @@ class Users {
                     }
                 }
             }
+            // Call update method.
             _user.update();
             System.out.print("revisions have been saved.");
             System.out.println(result);
@@ -339,29 +416,37 @@ class Users {
 
 
    public static void deleteByTC(String tc) throws SQLException {
-        User _user = new User();
+       // Create temp user
+       User _user = new User();
+       // Load the user with selected TC number
         _user.loadByTC(tc);
+        // Delete the user
          _user.delete();
     }
 
     public static void submitEmployeeWS() throws SQLException {
+        // Create temp user
         User _user = new User();
+        // Call the submitEmployeeWorksheet method
         _user.submitEmployeeWorksheet();
     }
 
     public static void checkEmployeeWS( ) throws SQLException{
+        // Create temp user
         User _user = new User();
+        // Call the loadEmployeeWorksheets method
         _user.loadEmployeeWorksheet();
-
     }
 
-    public void editWorksheet() throws SQLException {
+    public void editWorksheet() {
         //TODO Edit worksheet by everyone
 
     }
 
     public void approveWS() throws SQLException {
+        // Create temp user
         User _user = new User();
+        // Call the approveWorksheets method
         _user.approveWorksheets();
     }
 

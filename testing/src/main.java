@@ -20,17 +20,17 @@ public class main {
 
             switch (answer) {
                 case 1:
+                    //Call use register Procedure
                     Users.registerProcedure();
-
                     break;
                 case 2:
+                    //Call use login Procedure
                     if (Users.loginProcedure()) {
                         mainLoop = false;
                         break;
                     }
                     break;
                 case 3:
-
                     System.out.println("Bye Bye");
                     System.exit(0);
                     break;
@@ -42,21 +42,20 @@ public class main {
         }
         // redirection as authgroup
         switch (Users._authgroup) {
-            // employee
+            // If the user is employee
             case 1:
                 // call employee operations menu
-                String tcNo = Users._tcNo;
                 EmployeeOperations employeeOperations = new EmployeeOperations();
                 employeeOperations.main();
                 break;
 
-            // manager
+            // If the user is manager
             case 2:
-                tcNo = Users._tcNo;
+                //call manager operations menu
                 ManagerOperations managerOperations = new ManagerOperations();
                 managerOperations.main();
                 break;
-            // admin
+            // If the user is admin
             case 3:
                 // call admin operations menu
                 adminOperations adminOperations = new adminOperations();
@@ -64,6 +63,7 @@ public class main {
                 break;
 
             default:
+                // user not one of them
                 System.out.println("you are unknown, please contact your technical personal.");
                 System.exit(0);
         }
