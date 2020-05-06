@@ -25,7 +25,6 @@ public class EmployeeOperations {
             }
         }
     }
-
     private void checkWorksheets() throws SQLException {
         Users _user = new Users();
         // Call checkEmployeeWS

@@ -6,6 +6,7 @@ public class ManagerOperations {
     public Scanner scanner = new Scanner(System.in);
     public void main() throws SQLException {
 
+
         // TODO format
         boolean isContinue = true;
         while(isContinue) {

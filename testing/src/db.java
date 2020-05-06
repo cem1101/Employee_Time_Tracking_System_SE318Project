@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+
 public class db {
     // Url for DB connection
     private String url = "jdbc:mysql://79.98.129.3/bagdiken_se318?useLegacyDatetimeCode=false&serverTimezone=UTC";

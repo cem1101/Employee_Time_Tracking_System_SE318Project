@@ -19,6 +19,8 @@ class Users {
         public static String email;
         public static String tcNo;
 
+
+
       /*  public static boolean load(int _data){
             return load("id",""+_data);
         }*/
