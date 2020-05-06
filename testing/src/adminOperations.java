@@ -7,7 +7,6 @@ public class adminOperations {
             // TODO format
             boolean isContinue = true;
 
-
             while(isContinue) {
                 // Ask the admin to what he/she wants to do.
                 System.out.println("Press 1 to create new employees.. 2 to delete.. 3 to update ... 4 to check worksheet from employees 5 for exit");
