@@ -49,7 +49,7 @@ public class adminOperations {
         System.out.println("Email: ");
         String newEmail = scanner.next();
         System.out.println("TC NO: ");
-        int newTC_NO = scanner.nextInt();
+        String newTC_NO = scanner.next();
         System.out.println("Username: ");
         String newUsername = scanner.next();
         System.out.println("Password: ");

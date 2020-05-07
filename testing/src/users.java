@@ -32,7 +32,8 @@ class Users {
 
         private static boolean load(String colm, String _data){
             // Query that takes the user from DB with the wanted Column name and data
-            String qq = "SELECT * FROM users where "+ colm + "=" + _data;
+            String qq = "SELECT * FROM users where "+ colm + "=\"" + _data+"\"";
+
             try {
                 // Connect database
                 Connection connection = db.connect();
@@ -252,7 +253,43 @@ class Users {
 
     public static db db = new db();
 
-    public static void register(int newAuthgroup, String newName, String newSurname, String newUsername, String newPassword, int newAge, String newEmail, int newTC_NO  ) throws SQLException {
+    public static boolean register(int newAuthgroup, String newName, String newSurname, String newUsername, String newPassword, int newAge, String newEmail, String newTC_NO  ) throws SQLException {
+        if(newAge>200){
+            return false;
+        }
+
+        if(newAge<18){
+            return false;
+        }
+
+        if(newTC_NO.length() != 11){
+            return false;
+        }
+
+        if(newAuthgroup != 1 && newAuthgroup!=2 && newAuthgroup!=3){
+            return false;
+        }
+
+
+        if(newEmail.indexOf("@") == -1){
+            return false;
+        }
+        if(newEmail.indexOf(".") == -1){
+            return false;
+        }
+
+        int checkCounter = 0;
+        for (int i = 0; i < newEmail.length(); i++) {
+            if (newEmail.charAt(i) == '@') {
+                checkCounter++;
+            }
+        }
+        if(checkCounter>1){
+            return false;
+        }
+
+
+
         //Connect database
         Connection connection = db.connect();
         // Create prepared statement for sql query
@@ -265,9 +302,10 @@ class Users {
         preparedStatement.setString(5, newPassword);
         preparedStatement.setInt(6, newAge);
         preparedStatement.setString(7, newEmail);
-        preparedStatement.setInt(8, newTC_NO);
+        preparedStatement.setString(8, newTC_NO);
         // Execute the query
         preparedStatement.execute();
+        return true;
     }
 
 
@@ -294,7 +332,7 @@ class Users {
         System.out.print("Password: ");
         String newPassword = scanner.next();
         System.out.print("TC Number: ");
-        int newTC_NO = scanner.nextInt();
+        String newTC_NO = scanner.next();
 
         //Call user register method to save information to database
         Users.register(newAuthgroup, newName, newSurname, newUsername, newPassword, newAge, newEmail, newTC_NO);

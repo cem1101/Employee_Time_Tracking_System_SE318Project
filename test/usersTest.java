@@ -1,9 +1,13 @@
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Scanner;
 
 public class usersTest {
@@ -14,18 +18,33 @@ public class usersTest {
 
     @Before
     public void before(){
-        users = new Users();
+       // users = new Users();
     }
 
-    @Test // Expected: Success, if the worksheet is submitted
+
+
+    @AfterEach
+    public void after() throws SQLException {
+
+    }
+
+
+
+    public void deleteLastCreatedRow() throws SQLException {
+        Connection connection = db.connect();
+        String delete = "DELETE FROM users order by id desc limit 1";
+        PreparedStatement preparedStmt = connection.prepareStatement(delete);
+        preparedStmt.execute();
+    }
+   /*/* @Test // Expected: Success, if the worksheet is submitted
     public void login_as_employee_submitEmployeeWorksheetTest_Positive() throws SQLException {
         boolean submitted = false;
         users.login("e","e");
-        users.submitEmployeeWS();
+        //users.submitEmployeeWS();
         // TODO
 
-    }
-
+    }*/
+/*
     @Test // Expected: Success, if user can be deleted by TC number
     public void deleteByTC_Test_Positive() throws SQLException {
         users.deleteByTC("0");
@@ -39,24 +58,188 @@ public class usersTest {
             deleted = true;
         }
         // Test if the value of deleted is true or not
-        Assert.assertEquals(true, deleted);
+        Assert.assertEquals(false, deleted);
 
-        if(deleted) {
-            // ADD back deleted user
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users ( authgroup, name, surname, username, password, age, email, tc) " + "VALUES ( ?,? , ?, ? , ?, ?, ?, ?)");
-            // Set all the missing values in the query
-            preparedStatement.setInt(1, 3);
-            preparedStatement.setString(2, "0");
-            preparedStatement.setString(3, "0");
-            preparedStatement.setString(4, "0");
-            preparedStatement.setString(5, "0");
-            preparedStatement.setInt(6, 0);
-            preparedStatement.setString(7, "0");
-            preparedStatement.setInt(8, 0);
-            // Execute the query
-            preparedStatement.execute();
-        }
+
+    }*/
+
+
+
+    @Test // Expected: Success, if the user can register to the system
+    public void registerMethodTestPositive() throws SQLException {
+        Users user = new Users();
+        user.register(3,
+                "denemename",
+                "denemesurname",
+                "denemeusername",
+                "denemeparola",
+                99,
+                "deneme@mail.com",
+                "12345678901" );
+
+        Connection connection = db.connect();
+        Statement st = connection.createStatement();
+        String query = "SELECT * FROM users order by id desc limit 1";
+        ResultSet results = st.executeQuery(query);
+        results.next();
+
+
+        Assert.assertEquals("denemename",results.getString("name"));
+        Assert.assertEquals("denemesurname",results.getString("surname"));
+        Assert.assertEquals("denemeusername",results.getString("username"));
+        Assert.assertEquals("denemeparola",results.getString("password"));
+        Assert.assertEquals(99,results.getInt("age"));
+        Assert.assertEquals("deneme@mail.com",results.getString("email"));
+        Assert.assertEquals("12345678901",results.getString("tc"));
     }
+
+
+
+    public HashMap getLastRowInsertedOnUsers() throws SQLException {
+        Connection connection = db.connect();
+        Statement st = connection.createStatement();
+        String query = "SELECT * FROM users order by id desc limit 1";
+        ResultSet results = st.executeQuery(query);
+        results.next();
+        HashMap data = new HashMap();
+        data.put("id",results.getInt("id"));
+        data.put("authgroup",results.getInt("authgroup"));
+        data.put("name",results.getString("name"));
+        data.put("surname",results.getString("surname"));
+        data.put("username",results.getString("username"));
+        data.put("password",results.getString("password"));
+        data.put("age",results.getInt("age"));
+        data.put("email",results.getString("email"));
+        data.put("tc",results.getString("tc"));
+        return data;
+
+    }
+
+
+
+
+
+    public void  createDummyRowToUsers() throws SQLException {
+        users.register(3,
+                "denemename",
+                "denemesurname",
+                "denemeusername",
+                "denemeparola",
+                30,
+                "deneme@mail.com",
+                "12345678901" );
+    }
+
+
+
+
+
+
+    public boolean tryMailInput(String email) throws SQLException {
+    Users user = new Users();
+    return user.register(3,
+            "denemename",
+            "denemesurname",
+            "denemeusername",
+            "denemeparola",
+            29,
+            email,
+            "12345678901" );
+    }
+
+     // Expected: Success, if the user can register to the system
+
+
+    @Test
+    public void registerMethodTestNegativeForMailWithControlStatement1() throws SQLException {
+       // System.out.println(getLastRowInsertedOnUsers().get("id"));
+        Assert.assertFalse(tryMailInput("canbagdiken.com"));
+    }
+    @Test
+    public void registerMethodTestNegativeForMailWithControlStatement2() throws SQLException {
+        Assert.assertFalse(tryMailInput("can@@bagdiken.com"));
+    }
+    @Test
+    public void registerMethodTestNegativeForMailWithControlStatement3() throws SQLException {
+        Assert.assertFalse(tryMailInput("can@bagdikencom"));
+    }
+
+
+
+
+    @Test // Expected: Success, if the user can register to the system
+    public void registerMethodTestNegativeForTC() throws SQLException {
+        Users user = new Users();
+        user.register(3,
+                "denemename",
+                "denemesurname",
+                "denemeusername",
+                "denemeparola",
+                999999,
+                "deneme@mail.com",
+                "12345678901" );
+
+        Connection connection = db.connect();
+        Statement st = connection.createStatement();
+        String query = "SELECT * FROM users order by id desc limit 1";
+        ResultSet results = st.executeQuery(query);
+        results.next();
+        Assert.assertNotSame(999999999,results.getInt("age"));
+    }
+
+
+    @Test // Expected: Success, if the user can register to the system
+    public void registerMethodTestNegativeForHighAgeWithDB() throws SQLException {
+        Users user = new Users();
+        user.register(3,
+                "denemename",
+                "denemesurname",
+                "denemeusername",
+                "denemeparola",
+                999999,
+                "deneme@mail.com",
+                "12345678901" );
+
+        Connection connection = db.connect();
+        Statement st = connection.createStatement();
+        String query = "SELECT * FROM users order by id desc limit 1";
+        ResultSet results = st.executeQuery(query);
+        results.next();
+        Assert.assertNotSame(999999999,results.getInt("age"));
+    }
+
+    @Test // Expected: Success, if the user can register to the system
+    public void registerMethodTestNegativeForLowAgeWithControlCondition() throws SQLException {
+        Users user = new Users();
+        boolean result = user.register(3,
+                "denemename",
+                "denemesurname",
+                "denemeusername",
+                "denemeparola",
+                8,
+                "deneme@mail.com",
+                "12345678901" );
+
+
+        Assert.assertFalse(result);
+    }
+
+    @Test // Expected: Success, if the user can register to the system
+    public void registerMethodTestNegativeForHighAgeWithControlCondition() throws SQLException {
+        Users user = new Users();
+        boolean result = user.register(3,
+                "denemename",
+                "denemesurname",
+                "denemeusername",
+                "denemeparola",
+                201,
+                "deneme@mail.com",
+                "12345678901" );
+        Assert.assertFalse(result);
+    }
+
+/*
+
 
     @Test // Expected: Success, if the user can register to the system
     public void registerTestPositive() throws SQLException {
@@ -95,7 +278,7 @@ public class usersTest {
             // Execute query
             preparedStmt.execute();
         }
-    }
+    }*/
 
     @Test // Expected: Success, if user can login to the system
     public void loginTestPositive() throws SQLException {
@@ -132,38 +315,60 @@ public class usersTest {
     /** These are the negative tests that should fail (Fail means, the program works as expected) */
 
     @Test // Expected: Fail, if a manager user try to login as employee or admin
-    public void login_As_Manager_and_CheckForAuthgroupNegative() throws SQLException {
+    public void login_As_Manager_and_CheckForAuthgroupNegative1() throws SQLException {
         users.login("m","m");
         int authgroup = users._authgroup;
         // False values to check if they are coming or not
-        Assert.assertEquals(1,authgroup);
-        Assert.assertEquals(3,authgroup);
+        Assert.assertNotSame(1,authgroup);
+    }
+
+    @Test // Expected: Fail, if a manager user try to login as employee or admin
+    public void login_As_Manager_and_CheckForAuthgroupNegative2() throws SQLException {
+        users.login("m","m");
+        int authgroup = users._authgroup;
+        // False values to check if they are coming or not
+        Assert.assertNotSame(3,authgroup);
     }
 
     @Test // Expected: Fail, if a admin user try to login as employee or manager
-    public void login_As_Admin_and_CheckForAuthgroupNegative() throws SQLException {
+    public void login_As_Admin_and_CheckForAuthgroupNegative1() throws SQLException {
         users.login("123","123");
         int authgroup = users._authgroup;
         // False values to check if they are coming or not
-        Assert.assertEquals(2,authgroup);
-        Assert.assertEquals(1,authgroup);
+        Assert.assertNotSame(2,authgroup);
 
+    }
+
+    @Test // Expected: Fail, if a admin user try to login as employee or manager
+    public void login_As_Admin_and_CheckForAuthgroupNegative2() throws SQLException {
+        users.login("123","123");
+        int authgroup = users._authgroup;
+        // False values to check if they are coming or not
+        Assert.assertNotSame(1,authgroup);
     }
 
     @Test // Expected: Fail, if a employee user try to login as manager or admin
-    public void login_As_Employee_and_CheckForAuthgroupNegative() throws SQLException {
+    public void login_As_Employee_and_CheckForAuthgroupNegative1() throws SQLException {
         users.login("e","e");
         int authgroup = users._authgroup;
         // False values to check if they are coming or not
-        Assert.assertEquals(2,authgroup);
-        Assert.assertEquals(3,authgroup);
+        Assert.assertNotSame(3,authgroup);
     }
+
+    @Test // Expected: Fail, if a employee user try to login as manager or admin
+    public void login_As_Employee_and_CheckForAuthgroupNegative2() throws SQLException {
+        users.login("e","e");
+        int authgroup = users._authgroup;
+        // False values to check if they are coming or not
+        Assert.assertNotSame(2,authgroup);
+    }
+
 
     @Test // Expected: Fail: User uses wrong user name and password
     public void loginTestNegative() throws SQLException {
         boolean falseLogin = users.login("qwe","qwe");
         // Test: falseLogin is true
-        Assert.assertEquals(true, falseLogin);
+        Assert.assertEquals(false, falseLogin);
     }
 
     @Test // Expected: Fail, if tried to register a user that already exists
@@ -203,40 +408,49 @@ public class usersTest {
 
         } catch (Exception e){
             // Test: if negativeTest and name is equal
-            Assert.assertTrue(negativeTest.equals(name));
+            Assert.assertFalse(negativeTest.equals(name));
         }
 
     }
 
-    @Test
+   /* @Test
     public void login_as_employee_submitEmployeeWorksheetTest_Negative() throws SQLException {
         boolean submitted = false;
         users.login("e","e");
         users.submitEmployeeWS();
         // TODO submit ws negative
+    } */
+
+    @Test //Expected: Fail, if try to delete a user that doesn't exist
+    public void deleteByTC_Test_Positive() throws SQLException {
+        Users users = new Users();
+        createDummyRowToUsers();
+        int oldAmount = Integer.parseInt(getLastRowInsertedOnUsers().get("id").toString());
+        users.deleteByTC("12345678901");
+        int newAmount = Integer.parseInt(getLastRowInsertedOnUsers().get("id").toString());
+        Assert.assertTrue(oldAmount!=newAmount);
     }
+
 
     @Test //Expected: Fail, if try to delete a user that doesn't exist
     public void deleteByTC_Test_Negative() throws SQLException {
-        // Defined a non-exist user to delete
-        users.deleteByTC("900");
-        boolean deleted = true;
-        // Delete query
-        String query = "DELETE FROM users WHERE tc = " + users._tcNo;
-        // Connection to database
-        Connection connection = null;
-        Statement st = null;
-        ResultSet managerRS = null;
+        createDummyRowToUsers();
+        int oldAmount = Integer.parseInt(getLastRowInsertedOnUsers().get("id").toString());
+        users.deleteByTC("abcdefg");
+        int newAmount = Integer.parseInt(getLastRowInsertedOnUsers().get("id").toString());
 
-        // try: The query is executable? If not catch
-        try {
-            connection = db.connect();
-            st = connection.createStatement();
-            managerRS = st.executeQuery(query);
-        }catch (SQLException sE) {
-                deleted = false;
-        }
-        // Test: If deleted is true
-        Assert.assertEquals(true, deleted);
+        deleteLastCreatedRow();
+        Assert.assertTrue(oldAmount==newAmount);
     }
+
+
+
+
+
+
+
+
+
+
+
 }
