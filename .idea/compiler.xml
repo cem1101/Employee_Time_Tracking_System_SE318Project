@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Employee_Time_Tracking_System_1-Gun_MustafaCan_Berk_Cem" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Employee_Time_Tracking_System_1-Gun_MustafaCan_Berk_Cem" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>

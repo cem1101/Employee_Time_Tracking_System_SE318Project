@@ -310,21 +310,72 @@ class Users {
 
 
 
+
+
+
+
     public static void registerProcedure()  throws  SQLException{
         // TODO Give error if someone enter wrong information
         // TODO pick good variable names
 
         //Take all the information from the user
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the fallowing information respectively");
-        System.out.print("Authgroup: ");
-        int newAuthgroup = scanner.nextInt();
-        System.out.print("Name: ");
-        String newName = scanner.next();
-        System.out.print("Surname: ");
-        String newSurname = scanner.next();
-        System.out.print("Age: ");
-        int newAge = scanner.nextInt();
+        //System.out.println("Please enter the fallowing information respectively");
+        //System.out.print("Authgroup: ");
+        //int newAuthgroup = scanner.nextInt();
+        boolean pass=false;
+        String newName="",newSurname="",tmp;
+        int newAuthgroup=1,newAge = 0;
+/*
+        // asks users her or his name while he/she enter in correct format
+        do {
+            pass=true;
+            System.out.print("Name: ");
+            tmp = scanner.next();
+            if(tmp.length() < 3 || tmp.length() > 10){
+                pass=false;
+                System.out.println("Your name should be longer than 2 characters and shorter than 10 character!");
+            }else{
+                newName = tmp;
+                pass=true;
+            }
+        }while(!pass);
+
+
+        // asks users her or his surname while he/she enter in correct format
+        do {
+            pass=true;
+            System.out.print("Surname: ");
+            tmp = scanner.next();
+            if(tmp.length() < 3 || tmp.length() > 10){
+                pass=false;
+                System.out.println("Your Surname should be longer than 2 characters and shorter than 10 character!");
+            }else{
+                newSurname = tmp;
+                pass=true;
+            }
+        }while(!pass);
+
+        */
+
+
+        // asks users her or his age while he/she enter in correct format
+        do {
+            pass=true;
+            System.out.print("Age: ");
+            tmp = scanner.next();
+            if(!validationFunctions.isNumeric(tmp)){
+                pass=false;
+                System.out.println("Your Age should be numeric, longer than 2 characters and shorter than 10 character!");
+            }else{
+                newAge = Integer.parseInt(tmp);
+                pass=true;
+            }
+        }while(!pass);
+
+
+
+
         System.out.print("Email: ");
         String newEmail = scanner.next();
         System.out.print("Username: ");
