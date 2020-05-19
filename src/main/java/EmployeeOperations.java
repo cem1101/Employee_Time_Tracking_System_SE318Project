@@ -8,7 +8,7 @@ public class EmployeeOperations {
         boolean isContinue = true;
         while(isContinue) {
             // Ask the employee to what he/she wants to do.
-            System.out.println("Press 1 to see all worksheets you are responsible for.. 2 to send worksheet to admin.. 3 to edit worksheets 4 to exit");
+            System.out.println("Press 1 to see all worksheets you are responsible for.. \n2 to send worksheet to admin.. \n3 to edit worksheets... \n4 to exit");
             switch (scanner.nextInt()) {
                 case 1:
                     checkWorksheets();

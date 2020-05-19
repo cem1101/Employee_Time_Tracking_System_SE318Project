@@ -9,7 +9,7 @@ public class adminOperations {
 
             while(isContinue) {
                 // Ask the admin to what he/she wants to do.
-                System.out.println("Press 1 to create new employees.. 2 to delete.. 3 to update ... 4 to check worksheet from employees 5 for exit");
+                System.out.println("Press 1 to create new employees.. \n 2 to delete.. \n 3 to update ... \n 4 to check worksheet from employees... \n 5 for exit");
                 switch (scanner.nextInt()) {
                     case 1:
                         create();

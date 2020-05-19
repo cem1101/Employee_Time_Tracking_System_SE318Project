@@ -9,7 +9,7 @@ public class ManagerOperations {
         boolean isContinue = true;
         while(isContinue) {
             // Ask the manager to what he/she wants to do.
-            System.out.println("Press 1 to see check worksheets needed to be approved.. 2 to edit worksheets.. 3 to exit");
+            System.out.println("Press 1 to see check worksheets needed to be approved.. \n2 to edit worksheets.. \n3 to exit");
             switch (scanner.nextInt()) {
                 case 1:
                     approveWorksheets();

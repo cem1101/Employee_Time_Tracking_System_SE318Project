@@ -278,7 +278,8 @@ class Users {
             Connection connection = db.connect();
             Scanner scanner = new Scanner(System.in);
             Statement st = connection.createStatement();
-
+            String select2 ="";
+            String select ="";
             System.out.println("Enter the worksheet ID you want to edit");
             int option  = scanner.nextInt();
             String query = "Select * FROM worksheets Where ID = " + option;
@@ -288,9 +289,14 @@ class Users {
                 System.out.println("No worksheet with that id :" + option);
             }
             else {
-                System.out.println("Do you want to change status or content");
-                String select = scanner.next();
-                if (select.equals("status")) {
+                if(_authgroup == 2 || _authgroup == 3) {
+                    System.out.println("Do you want to change status or content");
+                    select = scanner.next();
+                }
+                else
+                    select2 = "content";
+
+                if (select.equals("status") ) {
                     System.out.println("Enter new status value: ");
                     int status = scanner.nextInt();
                     String queryStatus = "Update worksheets set status = ? where ID = ?";
@@ -298,7 +304,7 @@ class Users {
                     pt.setInt(1, status);
                     pt.setInt(2, option);
                     pt.executeUpdate();
-                } else if (select.equals("content")) {
+                } else if (select.equals("content")|| select2.equals("content")) {
                     System.out.println("Enter new content : ");
                     String content = scanner.next();
                     String contentStatus = "Update worksheets set content = ? where ID = ?";
