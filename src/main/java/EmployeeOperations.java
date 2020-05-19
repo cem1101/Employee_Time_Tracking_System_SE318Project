@@ -37,7 +37,7 @@ public class EmployeeOperations {
         _user.submitEmployeeWS();
     }
 
-    private void editWorksheet() {
+    private void editWorksheet() throws SQLException {
         Users _user = new Users();
         // Call editWorksheet
         _user.editWorksheet();

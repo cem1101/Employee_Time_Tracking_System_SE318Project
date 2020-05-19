@@ -182,31 +182,54 @@ class Users {
         private void approveWorksheets() throws SQLException {
             Scanner scanner = new Scanner(System.in);
             // Write query for the taking all the worksheets that are not approved or wanted to revised.
-            String query = "Select * FROM worksheets Where status = 0 or status = 2";
+            String queryManager = "Select * FROM worksheets Where status = 1";
+            String queryAdmin = "Select * FROM worksheets Where status = 0 OR status = 2";
+            boolean found = false;
+            Connection connection = db.connect();
             //TODO Make a method just for loading worksheet info so that loadEmployeeWorksheet and approveWorksheets
             // TODO can use it.
             //Connect database
-            Connection connection = db.connect();
             // Create the statement without missing values
             Statement st = connection.createStatement();
             // Execute the query
-            ResultSet loadWorksheets = st.executeQuery(query);
-            System.out.println("These are the available worksheets right now:");
+
             // Take and print all the worksheet information until there is no more.
-            while(loadWorksheets.next()){
-                int id = loadWorksheets.getInt("ID");
-                String responsible = loadWorksheets.getString("responsible");
-                int responsibleID = loadWorksheets.getInt("responsibleID");
-                String admin = loadWorksheets.getString("admin");
-                String manager = loadWorksheets.getString("manager");
-                String content = loadWorksheets.getString("content");
-                int status = loadWorksheets.getInt("status");
-                System.out.printf("ID: %d%nResponsible: %s%nResponsibleID: %d%nAdmin: %s%nManager: %s%nContent: %s%nStatus: %d%n",id,responsible,responsibleID,admin,manager,content,status);
-                System.out.printf("--------------------------------------------------------------------------------------------------------------------------------------------------------%n");
-        }
-            int wsID;
+            if(_authgroup == 2) {
+                ResultSet loadWorksheetsManager = st.executeQuery(queryManager);
+                while (loadWorksheetsManager.next()) {
+                    System.out.println("These are the available worksheets right now:");
+                    int id = loadWorksheetsManager.getInt("ID");
+                    String responsible = loadWorksheetsManager.getString("responsible");
+                    int responsibleID = loadWorksheetsManager.getInt("responsibleID");
+                    String admin = loadWorksheetsManager.getString("admin");
+                    String manager = loadWorksheetsManager.getString("manager");
+                    String content = loadWorksheetsManager.getString("content");
+                    int status = loadWorksheetsManager.getInt("status");
+                    System.out.printf("ID: %d%nResponsible: %s%nResponsibleID: %d%nAdmin: %s%nManager: %s%nContent: %s%nStatus: %d%n", id, responsible, responsibleID, admin, manager, content, status);
+                    System.out.printf("--------------------------------------------------------------------------------------------------------------------------------------------------------%n");
+                    found = true;
+                }
+            }
+            if(_authgroup == 3){
+                ResultSet loadWorksheetsAdmin = st.executeQuery(queryAdmin);
+                while (loadWorksheetsAdmin.next()) {
+                    System.out.println("These are the available worksheets right now:");
+                    int id = loadWorksheetsAdmin.getInt("ID");
+                    String responsible = loadWorksheetsAdmin.getString("responsible");
+                    int responsibleID = loadWorksheetsAdmin.getInt("responsibleID");
+                    String admin = loadWorksheetsAdmin.getString("admin");
+                    String manager = loadWorksheetsAdmin.getString("manager");
+                    String content = loadWorksheetsAdmin.getString("content");
+                    int status = loadWorksheetsAdmin.getInt("status");
+                    System.out.printf("ID: %d%nResponsible: %s%nResponsibleID: %d%nAdmin: %s%nManager: %s%nContent: %s%nStatus: %d%n", id, responsible, responsibleID, admin, manager, content, status);
+                    System.out.printf("--------------------------------------------------------------------------------------------------------------------------------------------------------%n");
+                    found = true;
+                }
+            }
+
+            int wsID = 0;
             // Until the wanted worksheet founded make a loop
-            while(true) {
+            while(found) {
                 // Take the worksheet ID that admin or manager wants to change
                 System.out.println("Write the worksheet ID you want to approved or revised");
                 wsID = scanner.nextInt();
@@ -216,10 +239,8 @@ class Users {
                 ResultSet approveWorksheets = st.executeQuery(query2);
                 // IF there is no worksheet with wanted ID give an error message
                 if (!approveWorksheets.next()) {
-                    System.out.println("there is no user!");
-                }else
-                    break;
-            }
+                    System.out.println("there is no worksheet with id: " + wsID);
+                }
             // Take the option if worksheet is approved or needs to be revised.
             System.out.println("If you want to approve it press 1.. if you want it to be revised press 2");
             int choice = scanner.nextInt();
@@ -227,15 +248,66 @@ class Users {
             // Write the query that calls worksheet with wanted ID then
             // Change the status with given value and after that change the manager name that
             // who changed the worksheet information
-            String query3 = "update worksheets set manager = ?, status = ? where ID = " + wsID;
+            String queryAddManager = "update worksheets set manager = ?, status = ? where ID = " + wsID;
+            String queryAddAdmin = "update worksheets set admin = ?, status = ? where ID = " + wsID;
             // Create prepared statement because query have missing values
-            PreparedStatement preparedStatement = connection.prepareStatement(query3);
-            // Enter the missing values
-            preparedStatement.setString(1, this.name);
-            preparedStatement.setInt(2, choice);
-            // Execute query
-            preparedStatement.execute();
-            System.out.println("Your choice have been done! ");
+                if(_authgroup == 2) {
+                    PreparedStatement preparedStatement = connection.prepareStatement(queryAddManager);
+                    // Enter the missing values
+                    preparedStatement.setString(1, _name);
+                    preparedStatement.setInt(2, choice);
+                    // Execute query
+                    preparedStatement.executeUpdate();
+                    System.out.println("Your choice have been done! ");
+                    break;
+                }
+                if(_authgroup == 3){
+                    PreparedStatement preparedStatement = connection.prepareStatement(queryAddAdmin);
+                    // Enter the missing values
+                    preparedStatement.setString(1, _name);
+                    preparedStatement.setInt(2, choice);
+                    // Execute query
+                    preparedStatement.executeUpdate();
+                    System.out.println("Your choice have been done! ");
+                    break;
+                }
+            }
+        }
+
+        public void editWorksheet() throws SQLException {
+            Connection connection = db.connect();
+            Scanner scanner = new Scanner(System.in);
+            Statement st = connection.createStatement();
+
+            System.out.println("Enter the worksheet ID you want to edit");
+            int option  = scanner.nextInt();
+            String query = "Select * FROM worksheets Where ID = " + option;
+
+            ResultSet worksheets = st.executeQuery(query);
+            if(!worksheets.next()) {
+                System.out.println("No worksheet with that id :" + option);
+            }
+            else {
+                System.out.println("Do you want to change status or content");
+                String select = scanner.next();
+                if (select.equals("status")) {
+                    System.out.println("Enter new status value: ");
+                    int status = scanner.nextInt();
+                    String queryStatus = "Update worksheets set status = ? where ID = ?";
+                    PreparedStatement pt = connection.prepareStatement(queryStatus);
+                    pt.setInt(1, status);
+                    pt.setInt(2, option);
+                    pt.executeUpdate();
+                } else if (select.equals("content")) {
+                    System.out.println("Enter new content : ");
+                    String content = scanner.next();
+                    String contentStatus = "Update worksheets set content = ? where ID = ?";
+                    PreparedStatement pt = connection.prepareStatement(contentStatus);
+                    pt.setString(1, content);
+                    pt.setInt(2, option);
+                    pt.executeUpdate();
+                }
+            }
         }
     }
 
@@ -529,8 +601,10 @@ class Users {
         _user.loadEmployeeWorksheet();
     }
 
-    public void editWorksheet() {
+    public void editWorksheet() throws SQLException {
         //TODO Edit worksheet by everyone
+        User _user = new User();
+        _user.editWorksheet();
 
     }
 

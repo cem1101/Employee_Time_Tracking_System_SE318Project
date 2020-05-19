@@ -34,7 +34,8 @@ public class adminOperations {
         }
 
     private void checkWorksheets() throws SQLException {
-            // TODO
+            Users _user = new Users();
+            _user.approveWS();
     }
 
     private void create() throws SQLException {

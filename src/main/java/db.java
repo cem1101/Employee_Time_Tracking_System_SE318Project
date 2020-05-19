@@ -11,6 +11,4 @@ public class db {
         // Connect and retırn the connection
         return DriverManager.getConnection(url,"bagdiken_se318","XEZ#)^My3BHm");
     }
-
-
 }

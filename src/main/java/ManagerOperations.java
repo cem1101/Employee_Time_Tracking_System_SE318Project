@@ -2,11 +2,9 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class ManagerOperations {
-
     public Scanner scanner = new Scanner(System.in);
+
     public void main() throws SQLException {
-
-
         // TODO format
         boolean isContinue = true;
         while(isContinue) {
@@ -17,16 +15,18 @@ public class ManagerOperations {
                     approveWorksheets();
                     break;
                 case 2:
-                    // TODO
+                    editWorkSheets();
                     break;
                 case 3:
-                    // TODO
-                    break;
-                case 4:
                     System.exit(1);
                     break;
             }
         }
+    }
+
+    private void editWorkSheets() throws SQLException {
+        Users _user = new Users();
+        _user.editWorksheet();
     }
 
     private void approveWorksheets() throws SQLException {
